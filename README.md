@@ -1,6 +1,6 @@
 # local-kube
 
-All small poc's regarding kubernetes, in local kind cluster.
+All small poc's regarding kubernetes, in local kind kubernetes cluster.
 
 ## pre-requirements
 
