@@ -42,8 +42,8 @@ function _cert_manager() {
   
   helm install cert-manager jetstack/cert-manager \
     -n cert-manager --create-namespace \
-    --version v1.10.1 \
-    --set installCRDs=true
+    --set installCRDs=true \
+    # --version v1.10.1
 }
 
 function _devtron() {
@@ -55,7 +55,7 @@ function _devtron() {
     --set components.devtron.service.type=NodePort \
     --set installer.modules={cicd} \
     --set argo-cd.enabled=true \
-    --version 0.22.47
+    # --version 0.22.47
 }
 
 function _longhorn () {
@@ -65,8 +65,9 @@ function _longhorn () {
   helm install longhorn longhorn/longhorn \
     --namespace longhorn-system \
     --create-namespace \
-    --version 1.3.2
+    # --version 1.3.2
 }
 
 _kube_prometheus
 # _devtron
+_cert_manager
