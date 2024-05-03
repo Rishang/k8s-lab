@@ -5,7 +5,7 @@ KIND_CLUSTER_NAME=kind-$(CLUSTER_NAME)
 
 # ---- versions ----
 KUBERNETES_VERSION=v1.29.0
-METALLB_VERSION=v0.13.11
+METALLB_VERSION=v0.14.5
 CILIUM_VERSION=v1.15.4
 
 @use_context: use-context
