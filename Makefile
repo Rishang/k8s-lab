@@ -4,7 +4,7 @@ CLUSTER_NAME=local
 KIND_CLUSTER_NAME=kind-$(CLUSTER_NAME)
 
 # ---- versions ----
-KUBERNETES_VERSION=v1.29.0
+KUBERNETES_VERSION=v1.30.0
 METALLB_VERSION=v0.14.5
 CILIUM_VERSION=v1.15.4
 
@@ -29,7 +29,15 @@ init: @use_context
 
 cilium: @use_context
 	helm repo add cilium https://helm.cilium.io/
-	helm install cilium cilium/cilium --version ${CILIUM_VERSION} --namespace kube-system
+	helm install cilium cilium/cilium --version 1.15.4 \
+		--namespace kube-system \
+		--set prometheus.enabled=true --set envoy.enabled=true \
+		--set operator.prometheus.enabled=true \
+		--set hubble.enabled=true \
+		--set hubble.metrics.enableOpenMetrics=true \
+		--set hubble.relay.enabled=true \
+		--set hubble.ui.enabled=true \
+		--set hubble.metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,httpV2:exemplars=true;labelsContext=source_ip\,source_namespace\,source_workload\,destination_ip\,destination_namespace\,destination_workload\,traffic_direction}"
 	kubectl -n kube-system delete daemonset kindnet
 
 ingress-nginx: @use_context
