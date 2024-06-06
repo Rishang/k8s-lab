@@ -6,7 +6,7 @@ KIND_CLUSTER_NAME=kind-$(CLUSTER_NAME)
 # ---- versions ----
 KUBERNETES_VERSION=v1.30.0
 METALLB_VERSION=v0.14.5
-CILIUM_VERSION=v1.15.4
+CILIUM_VERSION=v1.15.5
 
 @use_context: use-context
 
@@ -18,7 +18,16 @@ remove-cluster:
 	kind delete cluster -n ${CLUSTER_NAME}
 
 use-context:
-	@((kubectl config current-context | grep -q ${KIND_CLUSTER_NAME}) || kubectl config use-context ${KIND_CLUSTER_NAME})
+	@if kubectl config current-context | grep -q minikube; then \
+		echo "Current context is minikube. No need to change the context."; \
+	else \
+		if kubectl config current-context | grep -q $(KIND_CLUSTER_NAME); then \
+			echo "Current context is already set to kind."; \
+		else \
+			echo "Setting context to kind."; \
+			kubectl config use-context $(KIND_CLUSTER_NAME); \
+		fi \
+	fi
 
 init: @use_context
 	@echo "Initializing cluster"
@@ -29,7 +38,8 @@ init: @use_context
 
 cilium: @use_context
 	helm repo add cilium https://helm.cilium.io/
-	helm install cilium cilium/cilium --version 1.15.4 \
+	helm repo update
+	helm install cilium cilium/cilium --version ${CILIUM_VERSION} \
 		--namespace kube-system \
 		--set prometheus.enabled=true --set envoy.enabled=true \
 		--set operator.prometheus.enabled=true \
