@@ -48,7 +48,7 @@ cilium: @use_context
 		--set hubble.relay.enabled=true \
 		--set hubble.ui.enabled=true \
 		--set hubble.metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,httpV2:exemplars=true;labelsContext=source_ip\,source_namespace\,source_workload\,destination_ip\,destination_namespace\,destination_workload\,traffic_direction}"
-	kubectl -n kube-system delete daemonset kindnet
+	kubectl -n kube-system delete daemonset kindnet || kubectl -n kube-system delete daemonset kube-proxy
 
 ingress-nginx: @use_context
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
