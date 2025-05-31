@@ -1,0 +1,82 @@
+version: '3'
+
+env:
+  CLUSTER_NAME: local
+  KIND_CLUSTER_NAME: kind-{{.CLUSTER_NAME}}
+  KUBERNETES_VERSION: v1.31.0
+  METALLB_VERSION: v0.14.9
+  CILIUM_VERSION: v1.17.4
+  SHELL: /usr/bin/env bash
+
+tasks:
+  use_context:
+    desc: Switch kubectl context to the appropriate cluster
+    cmds:
+      - |
+        if kubectl config current-context | grep -q minikube; then
+          echo "Current context is minikube. No need to change the context."
+        else
+          if kubectl config current-context | grep -q {{.KIND_CLUSTER_NAME}}; then
+            echo "Current context is already set to kind."
+          else
+            echo "Setting context to kind."
+            kubectl config use-context {{.KIND_CLUSTER_NAME}}
+          fi
+        fi
+    silent: true
+  
+  cluster:create:
+    desc: Create a kind cluster and initialize it
+    cmds:
+      - echo "Creating cluster {{.CLUSTER_NAME}} with Kubernetes version {{.KUBERNETES_VERSION}}"
+      - bash ./scripts/kind-cluster.sh
+      - task: init
+
+  cluster:remove:
+    desc: Delete the kind cluster
+    cmds:
+      - kind delete cluster -n {{.CLUSTER_NAME}}
+
+
+
+  cluster:init:
+    desc: Initialize cluster with namespaces and load balancer
+    deps: [use_context]
+    cmds:
+      - echo "Initializing cluster"
+      - kubectl create namespace test
+      - kubectl create namespace monitoring
+      - kubectl create namespace ops
+      - bash ./scripts/lb.sh
+
+  cilium:
+    desc: Install Cilium CNI with Helm
+    deps: [use_context]
+    cmds:
+      - helm repo add cilium https://helm.cilium.io/
+      - helm repo update
+      - |
+        helm install cilium cilium/cilium --version {{.CILIUM_VERSION}} \
+          --namespace kube-system \
+          --set prometheus.enabled=true --set envoy.enabled=true \
+          --set operator.prometheus.enabled=true \
+          --set hubble.enabled=true \
+          --set hubble.metrics.enableOpenMetrics=true \
+          --set hubble.relay.enabled=true \
+          --set hubble.ui.enabled=true \
+          --set hubble.metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,httpV2:exemplars=true;labelsContext=source_ip\,source_namespace\,source_workload\,destination_ip\,destination_namespace\,destination_workload\,traffic_direction}"
+      - kubectl -n kube-system delete daemonset kindnet || kubectl -n kube-system delete daemonset kube-proxy
+
+  ingress-nginx:
+    desc: Install ingress-nginx with Helm
+    deps: [use_context]
+    cmds:
+      - helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+      - helm repo update
+      - helm install ingress-nginx --namespace ingress --create-namespace ingress-nginx/ingress-nginx
+
+  install-helm:
+    desc: Install Helm using the test script
+    deps: [use_context]
+    cmds:
+      - bash ./test/helm/helm.sh 
