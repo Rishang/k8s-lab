@@ -54,13 +54,12 @@ releases:
     namespace: devtroncd
     createNamespace: true
     chart: devtron/devtron-operator
-    set:
-      - name: components.devtron.service.type
-        value: NodePort
-      - name: installer.modules
-        value: "{cicd}"
-      - name: argo-cd.enabled
-        value: true
+    values:
+      - installer:
+          modules:
+            - cicd
+        argo-cd:
+          enabled: true
     # version: 0.22.47  # uncomment to specify version
 
   # Longhorn - distributed block storage for Kubernetes
