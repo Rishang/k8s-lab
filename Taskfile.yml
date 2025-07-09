@@ -81,7 +81,7 @@ tasks:
     cmds:
       - |
         case "{{.CLI_ARGS}}" in
-          list)
+          ls)
             echo -e "\nAvailable charts:" && \
             yq '.releases[].name' helmfile.yaml | sed 's/^/  /'
             ;;
@@ -90,7 +90,7 @@ tasks:
             helmfile apply
             ;;
           "")
-            echo "Usage: task helm -- list | all | <chart-name>"
+            echo "Usage: task helm -- ls | all | <chart-name>"
             ;;
           *)
             echo "Deploying specific chart: {{.CLI_ARGS}}"
