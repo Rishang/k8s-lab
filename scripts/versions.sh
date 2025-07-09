@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function github_version() {
   repo=$1

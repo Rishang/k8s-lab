@@ -73,8 +73,27 @@ tasks:
       - helm repo update
       - helm install ingress-nginx --namespace ingress --create-namespace ingress-nginx/ingress-nginx
 
-  install-helm:
-    desc: Install Helm using the test script
+  helm:
+    desc: Manage Helm charts using Helmfile
+    dir: ./helm
     deps: [use_context]
+    silent: true
     cmds:
-      - bash ./test/helm/helm.sh
+      - |
+        case "{{.CLI_ARGS}}" in
+          list)
+            echo -e "\nAvailable charts:" && \
+            yq '.releases[].name' helmfile.yaml | sed 's/^/  /'
+            ;;
+          all)
+            echo "Deploying all Helm charts..."
+            helmfile apply
+            ;;
+          "")
+            echo "Usage: task helm -- list | all | <chart-name>"
+            ;;
+          *)
+            echo "Deploying specific chart: {{.CLI_ARGS}}"
+            helmfile apply --selector name={{.CLI_ARGS}}
+            ;;
+        esac
