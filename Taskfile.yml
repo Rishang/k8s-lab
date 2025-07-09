@@ -75,7 +75,7 @@ tasks:
 
   helm:
     desc: Manage Helm charts using Helmfile
-    dir: ./helm
+    dir: ./manifest/helm
     deps: [use_context]
     silent: true
     cmds:
