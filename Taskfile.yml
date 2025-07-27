@@ -63,7 +63,8 @@ tasks:
           --set hubble.relay.enabled=true \
           --set hubble.ui.enabled=true \
           --set hubble.metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,httpV2:exemplars=true;labelsContext=source_ip\,source_namespace\,source_workload\,destination_ip\,destination_namespace\,destination_workload\,traffic_direction}"
-      - kubectl -n kube-system delete daemonset kindnet || kubectl -n kube-system delete daemonset kube-proxy
+      - kubectl -n kube-system delete daemonset kindnet || true
+      - kubectl -n kube-system delete daemonset kube-proxy || true
 
   ingress-nginx:
     desc: Install ingress-nginx with Helm
@@ -80,6 +81,10 @@ tasks:
     silent: true
     cmds:
       - |
+        (command -v helmfile > /dev/null 2>&1) || (echo "helmfile not found. Please install it: https://helmfile.readthedocs.io/en/latest/install/" && exit 1)
+        (command -v helm > /dev/null 2>&1) || (echo "helm not found. Please install it: https://helm.sh/docs/intro/install/" && exit 1)
+        (command -v yq > /dev/null 2>&1) || (echo "yq not found. Please install it: https://github.com/mikefarah/yq#install" && exit 1)
+        (helm plugin list | grep -q "diff") || helm plugin install https://github.com/databus23/helm-diff
         case "{{.CLI_ARGS}}" in
           ls)
             echo -e "\nAvailable charts:" && \
