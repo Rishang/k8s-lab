@@ -32,7 +32,7 @@ tasks:
       - bash ./scripts/kind-cluster.sh
       - task: cluster:init
 
-  cluster:remove:
+  cluster:destroy:
     desc: Delete the kind cluster
     cmds:
       - kind delete cluster -n {{.CLUSTER_NAME}}
