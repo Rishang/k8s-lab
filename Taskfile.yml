@@ -30,14 +30,14 @@ tasks:
     cmds:
       - echo "Creating cluster {{.CLUSTER_NAME}} with Kubernetes version {{.KUBERNETES_VERSION}}"
       - bash ./scripts/kind-cluster.sh
-      - task: cluster:set
+      - task: cluster:init
 
   cluster:destroy:
     desc: Delete the kind cluster
     cmds:
       - kind delete cluster -n {{.CLUSTER_NAME}}
 
-  cluster:set:
+  cluster:init:
     desc: Initialize cluster with namespaces and load balancer
     deps: [use_context]
     cmds:
