@@ -8,12 +8,12 @@ All small poc's regarding kubernetes, in local kind kubernetes cluster.
 - [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 - kubectl
 - helm
-- make
-- bash
 - lens
 - zsh (optional)
 - kubectx (optional)
 - kubens (optional)
+- taskfile
+- helmfile
 
 ## Getting started
 
