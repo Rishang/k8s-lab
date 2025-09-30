@@ -11,6 +11,8 @@ repositories:
     url: https://helm.devtron.ai
   - name: longhorn
     url: https://charts.longhorn.io
+  - name: metrics-server
+    url: https://kubernetes-sigs.github.io/metrics-server/
 
 releases:
   # Reloader - watches changes in ConfigMap and Secret and does rolling upgrades
@@ -19,6 +21,14 @@ releases:
     namespace: ops
     createNamespace: true
     chart: stakater/reloader
+
+  # Metrics Server - metrics server for Kubernetes
+  # ref: https://github.com/kubernetes-sigs/metrics-server
+  - name: metrics-server
+    namespace: kube-system
+    createNamespace: true
+    chart: metrics-server/metrics-server
+    # version: v0.6.4  # uncomment to specify version 
 
   # External Secrets Operator - integrates external secret management systems
   # ref: https://external-secrets.io/
@@ -60,7 +70,6 @@ releases:
             - cicd
         argo-cd:
           enabled: true
-    # version: 0.22.47  # uncomment to specify version
 
   # Longhorn - distributed block storage for Kubernetes
   # ref: https://longhorn.io/
@@ -69,3 +78,4 @@ releases:
     createNamespace: true
     chart: longhorn/longhorn
     # version: 1.3.2  # uncomment to specify version 
+
