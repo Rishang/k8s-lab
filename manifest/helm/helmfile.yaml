@@ -13,6 +13,10 @@ repositories:
     url: https://charts.longhorn.io
   - name: metrics-server
     url: https://kubernetes-sigs.github.io/metrics-server/
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: bitnami-labs
+    url: https://bitnami-labs.github.io/sealed-secrets
 
 releases:
   # Reloader - watches changes in ConfigMap and Secret and does rolling upgrades
@@ -86,3 +90,22 @@ releases:
     createNamespace: true
     chart: ingress-nginx/ingress-nginx
     # version: 4.11.0  # uncomment to specify version
+
+  # Argo CD
+  # ref: https://artifacthub.io/packages/helm/argo/argo-cd
+  - name: argo-cd
+    namespace: argocd
+    createNamespace: true
+    chart: argo/argo-cd
+    # version: 2.10.4  # uncomment to specify version
+    values:
+      - configs:
+          params:
+            server.insecure: true
+
+  # Sealed Secrets
+  # ref: https://artifacthub.io/packages/helm/bitnami-labs/sealed-secrets
+  - name: sealed-secrets
+    namespace: kube-system
+    createNamespace: true
+    chart: bitnami-labs/sealed-secrets
