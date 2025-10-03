@@ -105,7 +105,7 @@ releases:
 
   # Sealed Secrets
   # ref: https://artifacthub.io/packages/helm/bitnami-labs/sealed-secrets
-  - name: sealed-secrets
-    namespace: kube-system
-    createNamespace: true
-    chart: bitnami-labs/sealed-secrets
+  # - name: sealed-secrets
+  #   namespace: kube-system
+  #   createNamespace: true
+  #   chart: bitnami-labs/sealed-secrets
