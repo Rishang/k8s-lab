@@ -47,7 +47,8 @@ tasks:
       - kubectl create namespace ops
       - bash ./scripts/lb.sh
       - task: use_context
-      - task helm  -- metrics-server
+      - task helm -- cert-manager
+      - task helm -- metrics-server
 
   cilium:
     desc: Install Cilium CNI with Helm
