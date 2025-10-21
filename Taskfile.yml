@@ -3,7 +3,7 @@ version: "3"
 env:
   CLUSTER_NAME: local
   KIND_CLUSTER_NAME: kind-{{.CLUSTER_NAME}}
-  KUBERNETES_VERSION: v1.33.0
+  KUBERNETES_VERSION: v1.34.0
   METALLB_VERSION: v0.15.2
   CILIUM_VERSION: v1.17.5
   SHELL: /usr/bin/env bash
