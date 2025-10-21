@@ -15,6 +15,8 @@ tasks:
       - |
         if kubectl config current-context | grep -q minikube; then
           echo "Current context is minikube. No need to change the context."
+        elif kubectl config current-context | grep -q k3d-k3s; then
+          echo "Current context is k3d-k3s. No need to change the context."
         else
           if kubectl config current-context | grep -q {{.KIND_CLUSTER_NAME}}; then
             echo "Current context is already set to kind."
