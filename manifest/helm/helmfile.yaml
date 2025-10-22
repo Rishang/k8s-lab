@@ -53,6 +53,7 @@ releases:
 
   # Kube Prometheus Stack - monitoring stack
   # ref: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+  # Fix: if helm install fails due to missing CRDs, run: kubectl apply --server-side -f https://github.com/prometheus-operator/prometheus-operator/releases/latest/download/stripped-down-crds.yaml
   - name: kube-prometheus-stack
     namespace: monitoring
     createNamespace: true
