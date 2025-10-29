@@ -13,31 +13,66 @@ tasks:
     desc: Switch kubectl context to the appropriate cluster
     cmds:
       - |
-        if kubectl config current-context | grep -q minikube; then
-          echo "Current context is minikube. No need to change the context."
-        elif kubectl config current-context | grep -q k3d-k3s; then
-          echo "Current context is k3d-k3s. No need to change the context."
-        else
-          if kubectl config current-context | grep -q {{.KIND_CLUSTER_NAME}}; then
+        CURRENT_CONTEXT=$(kubectl config current-context)
+        case "$CURRENT_CONTEXT" in
+          *minikube*)
+            echo "Current context is minikube. No need to change the context."
+            ;;
+          *k3d*)
+            echo "Current context is k3d. No need to change the context."
+            ;;
+          *{{.KIND_CLUSTER_NAME}}*)
             echo "Current context is already set to kind."
-          else
+            ;;
+          *)
             echo "Setting context to kind."
             kubectl config use-context {{.KIND_CLUSTER_NAME}}
-          fi
-        fi
+            ;;
+        esac
     silent: true
 
   cluster:create:
+    vars:
+      PROVIDER: '{{.PROVIDER | default "kind"}}'
     desc: Create a kind cluster and initialize it
+    silent: true
     cmds:
       - echo "Creating cluster {{.CLUSTER_NAME}} with Kubernetes version {{.KUBERNETES_VERSION}}"
-      - bash ./scripts/kind-cluster.sh
+      - |
+        set -ex
+        case "{{.PROVIDER}}" in
+          kind)
+            bash ./scripts/kind-cluster.sh
+            bash ./scripts/lb.sh
+            ;;
+          k3d)
+            bash ./scripts/k3d-cluster.sh create
+            ;;
+          *)
+            echo "Invalid provider: {{.PROVIDER}}"
+            exit 1
+            ;;
+        esac
       - task: cluster:init
 
   cluster:destroy:
     desc: Delete the kind cluster
+    vars:
+      PROVIDER: '{{.PROVIDER | default "kind"}}'
     cmds:
-      - kind delete cluster -n {{.CLUSTER_NAME}}
+      - |
+        case "{{.PROVIDER}}" in
+          kind)
+            kind delete cluster -n {{.CLUSTER_NAME}}
+            ;;
+          k3d)
+            bash ./scripts/k3d-cluster.sh delete
+            ;;
+          *)
+            echo "Invalid provider: {{.PROVIDER}}"
+            exit 1
+            ;;
+        esac
 
   cluster:init:
     desc: Initialize cluster with namespaces and load balancer
@@ -47,10 +82,9 @@ tasks:
       - kubectl create namespace test
       - kubectl create namespace monitoring
       - kubectl create namespace ops
-      - bash ./scripts/lb.sh
       - task: use_context
-      - task helm -- cert-manager
-      - task helm -- metrics-server
+      - (kubectl get pods -A | grep cert-manager) || task helm -- cert-manager
+      - (kubectl get pods -n kube-system | grep metrics-server) || task helm -- metrics-server
 
   cilium:
     desc: Install Cilium CNI with Helm
