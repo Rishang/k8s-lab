@@ -129,6 +129,14 @@ releases:
     chart: oci://docker.io/envoyproxy/gateway-helm
     version: v0.0.0-latest
     disableValidation: true
+    hooks:
+      - events: ["postsync"]
+        command: "bash"
+        args:
+          - "-c"
+          - |
+            kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/latest/quickstart.yaml -n default
+        showlogs: true
 
   # Traefik - Modern HTTP reverse proxy and load balancer
   # ref: https://doc.traefik.io/traefik/
