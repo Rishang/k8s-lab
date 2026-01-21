@@ -19,6 +19,8 @@ repositories:
     url: https://bitnami-labs.github.io/sealed-secrets
   - name: headlamp
     url: https://kubernetes-sigs.github.io/headlamp/
+  - name: traefik
+    url: https://traefik.github.io/charts
 
 releases:
   # Reloader - watches changes in ConfigMap and Secret and does rolling upgrades
@@ -65,6 +67,7 @@ releases:
     namespace: cert-manager
     createNamespace: true
     chart: jetstack/cert-manager
+    disableValidation: true
     set:
       - name: crds.enabled
         value: true
@@ -90,14 +93,6 @@ releases:
     createNamespace: true
     chart: longhorn/longhorn
     # version: 1.3.2  # uncomment to specify version 
-
-  # Ingress Nginx - ingress controller
-  # ref: https://kubernetes.github.io/ingress-nginx/
-  - name: ingress-nginx
-    namespace: ingress
-    createNamespace: true
-    chart: ingress-nginx/ingress-nginx
-    # version: 4.11.0  # uncomment to specify version
 
   # Argo CD
   # ref: https://artifacthub.io/packages/helm/argo/argo-cd
@@ -125,3 +120,29 @@ releases:
     createNamespace: true
     chart: headlamp/headlamp
     # version: 0.2.0  # uncomment to specify version
+
+  # Envoy Gateway - Kubernetes-native API Gateway
+  # ref: https://gateway.envoyproxy.io/
+  - name: envoy-gateway
+    namespace: envoy-gateway
+    createNamespace: true
+    chart: oci://docker.io/envoyproxy/gateway-helm
+    version: v0.0.0-latest
+    disableValidation: true
+
+  # Traefik - Modern HTTP reverse proxy and load balancer
+  # ref: https://doc.traefik.io/traefik/
+  - name: traefik
+    namespace: traefik
+    createNamespace: true
+    chart: traefik/traefik
+    # version: 23.0.0  # uncomment to specify version
+
+  # NGINX Ingress Controller (Open Source)
+  # ref: https://docs.nginx.com/nginx-ingress-controller/install/helm/open-source/
+  - name: nginx-ingress
+    namespace: nginx-ingress
+    createNamespace: true
+    chart: oci://ghcr.io/nginx/charts/nginx-ingress
+    version: 2.4.1
+    disableValidation: true

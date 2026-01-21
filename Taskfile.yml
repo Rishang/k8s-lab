@@ -123,13 +123,13 @@ tasks:
             ;;
           all)
             echo "Deploying all Helm charts..."
-            helmfile apply
+            helmfile apply --skip-diff-on-install
             ;;
           "")
             echo "Usage: task helm -- ls | all | <chart-name>"
             ;;
           *)
             echo "Deploying specific chart: {{.CLI_ARGS}}"
-            helmfile apply --selector name={{.CLI_ARGS}}
+            helmfile apply --selector name={{.CLI_ARGS}} --skip-diff-on-install
             ;;
         esac
