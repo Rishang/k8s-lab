@@ -64,7 +64,7 @@ releases:
     namespace: monitoring
     createNamespace: true
     chart: common-charts/loki-stack
-    version: 1.0.2
+    version: 1.0.3
     values:
       - rustfs:
           enabled: false
