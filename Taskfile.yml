@@ -5,7 +5,7 @@ env:
   KIND_CLUSTER_NAME: kind-{{.CLUSTER_NAME}}
   KUBERNETES_VERSION: v1.34.0
   METALLB_VERSION: v0.15.2
-  CILIUM_VERSION: v1.17.5
+  CILIUM_VERSION: 1.20.0
   SHELL: /usr/bin/env bash
 
 tasks:
@@ -126,7 +126,15 @@ tasks:
             helmfile apply --skip-diff-on-install
             ;;
           "")
-            echo "Usage: task helm -- ls | all | <chart-name>"
+            echo "Usage: task helm -- ls | all | argocd | traefik | <chart-name>"
+            ;;
+          argocd|argo-cd)
+            echo "Deploying Argo CD..."
+            helmfile apply --selector name=argo-cd --skip-diff-on-install
+            ;;
+          traefik)
+            echo "Deploying Traefik..."
+            helmfile apply --selector name=traefik --skip-diff-on-install
             ;;
           *)
             echo "Deploying specific chart: {{.CLI_ARGS}}"

@@ -8,6 +8,7 @@ function create_cluster() {
   k3d cluster create ${CLUSTER_NAME} \
     --servers 1 \
     --agents 2 \
+    --k3s-arg "--disable=traefik@server:*" \
     -p "80:80@loadbalancer" \
     -p "443:443@loadbalancer" 
     # --image rancher/k3s:${KUBERNETES_VERSION}+k3s1 \
