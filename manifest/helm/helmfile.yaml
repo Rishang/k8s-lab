@@ -5,6 +5,10 @@ repositories:
     url: https://charts.external-secrets.io
   - name: common-charts
     url: https://rishang.github.io/helm-charts/charts
+  - name: sealed-secrets
+    url: https://bitnami.github.io/sealed-secrets
+  - name: rustfs
+    url: https://charts.rustfs.com
   - name: jetstack
     url: https://charts.jetstack.io
   - name: devtron
@@ -54,7 +58,7 @@ releases:
       - name: installCRDs
         value: true
 
-  # Loki Stack - logs, metrics, Grafana, Alloy, and in-cluster RustFS storage
+  # Loki Stack - logs, metrics, Grafana, and Alloy
   # ref: https://artifacthub.io/packages/helm/common-charts/loki-stack
   - name: loki-stack
     namespace: monitoring
@@ -63,7 +67,27 @@ releases:
     version: 1.0.2
     values:
       - rustfs:
-          enabled: true
+          enabled: false
+
+  # RustFS - S3-compatible object storage
+  # ref: https://artifacthub.io/packages/helm/rustfs/rustfs
+  - name: rustfs
+    namespace: rustfs
+    createNamespace: true
+    chart: rustfs/rustfs
+    version: 0.12.0
+    values:
+      - mode:
+          standalone:
+            enabled: true
+          distributed:
+            enabled: false
+        ingress:
+          enabled: false
+        secret:
+          rustfs:
+            access_key: admin
+            secret_key: admin
 
   # Cert Manager - certificate management
   # ref: https://cert-manager.io/docs/
@@ -112,12 +136,15 @@ releases:
           params:
             server.insecure: true
 
-  # Sealed Secrets
+  # Sealed Secrets - encrypt Secrets for safe Git storage
   # ref: https://artifacthub.io/packages/helm/bitnami-labs/sealed-secrets
-  # - name: sealed-secrets
-  #   namespace: kube-system
-  #   createNamespace: true
-  #   chart: bitnami-labs/sealed-secrets
+  - name: sealed-secrets
+    namespace: kube-system
+    createNamespace: true
+    chart: sealed-secrets/sealed-secrets
+    version: 2.19.1
+    values:
+      - fullnameOverride: sealed-secrets-controller
 
   # Headlamp - Kubernetes UI
   # ref: https://artifacthub.io/packages/helm/headlamp/headlamp
