@@ -3,8 +3,8 @@ repositories:
     url: https://stakater.github.io/stakater-charts
   - name: external-secrets
     url: https://charts.external-secrets.io
-  - name: prometheus-community
-    url: https://prometheus-community.github.io/helm-charts
+  - name: common-charts
+    url: https://rishang.github.io/helm-charts/charts
   - name: jetstack
     url: https://charts.jetstack.io
   - name: devtron
@@ -15,8 +15,6 @@ repositories:
     url: https://kubernetes-sigs.github.io/metrics-server/
   - name: argo
     url: https://argoproj.github.io/argo-helm
-  - name: bitnami-labs
-    url: https://bitnami-labs.github.io/sealed-secrets
   - name: headlamp
     url: https://kubernetes-sigs.github.io/headlamp/
   - name: traefik
@@ -56,14 +54,16 @@ releases:
       - name: installCRDs
         value: true
 
-  # Kube Prometheus Stack - monitoring stack
-  # ref: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
-  # Fix: if helm install fails due to missing CRDs, run: kubectl apply --server-side -f https://github.com/prometheus-operator/prometheus-operator/releases/latest/download/stripped-down-crds.yaml
-  - name: kube-prometheus-stack
+  # Loki Stack - logs, metrics, Grafana, Alloy, and in-cluster RustFS storage
+  # ref: https://artifacthub.io/packages/helm/common-charts/loki-stack
+  - name: loki-stack
     namespace: monitoring
     createNamespace: true
-    chart: prometheus-community/kube-prometheus-stack
-    version: 87.21.0
+    chart: common-charts/loki-stack
+    version: 1.0.2
+    values:
+      - rustfs:
+          enabled: true
 
   # Cert Manager - certificate management
   # ref: https://cert-manager.io/docs/
