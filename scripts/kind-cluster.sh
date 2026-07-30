@@ -2,7 +2,7 @@
 set -o errexit
 
 cluster_name="${CLUSTER_NAME:=local}"
-kubernetes_version="${KUBERNETES_VERSION:=v1.36.0}"
+kubernetes_version="${KUBERNETES_VERSION:=v1.36.1}"
 
 echo
 echo "CLUSTER_NAME: ${cluster_name}"

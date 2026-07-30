@@ -89,6 +89,32 @@ releases:
             access_key: admin
             secret_key: admin
 
+  # Mailpit - development SMTP server and web UI
+  # ref: https://github.com/axllent/mailpit
+  - name: mailpit
+    namespace: mailpit
+    createNamespace: true
+    chart: common-charts/component-chart
+    version: 0.0.1
+    values:
+      - containers:
+          - name: mailpit
+            image: axllent/mailpit
+            imageTag: v1.30.6
+            ports:
+              - name: smtp
+                containerPort: 1025
+              - name: web
+                containerPort: 8025
+        service:
+          ports:
+            - name: smtp
+              port: 1025
+              containerPort: 1025
+            - name: web
+              port: 8025
+              containerPort: 8025
+
   # Cert Manager - certificate management
   # ref: https://cert-manager.io/docs/
   - name: cert-manager
