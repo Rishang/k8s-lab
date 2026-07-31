@@ -68,6 +68,14 @@ releases:
     values:
       - rustfs:
           enabled: false
+        loki:
+          singleBinary:
+            extraVolumes:
+              - name: storage
+                emptyDir: {}
+            extraVolumeMounts:
+              - name: storage
+                mountPath: /var/loki
 
   # RustFS - S3-compatible object storage
   # ref: https://artifacthub.io/packages/helm/rustfs/rustfs
