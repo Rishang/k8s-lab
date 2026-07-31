@@ -207,11 +207,34 @@ releases:
 
   # Traefik - Modern HTTP reverse proxy and load balancer
   # ref: https://doc.traefik.io/traefik/
+  # Requires Gateway API CRDs (standard channel) to be installed first — this chart does not ship them:
+  #   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
   - name: traefik
     namespace: traefik
     createNamespace: true
     chart: traefik/traefik
     version: 41.1.0
+    disableValidation: true
+    values:
+      - providers:
+          kubernetesGateway:
+            enabled: true
+        # Chart creates GatewayClass "traefik" (controller traefik.io/gateway-controller)
+        gatewayClass:
+          enabled: true
+          name: traefik
+        # ...and a Gateway "traefik-gateway" in the traefik namespace
+        gateway:
+          enabled: true
+          name: traefik-gateway
+          listeners:
+            web:
+              port: 8000
+              protocol: HTTP
+              # allow HTTPRoutes from any namespace to attach (lab convenience;
+              # default is same-namespace only)
+              namespacePolicy:
+                from: All
 
   # NGINX Ingress Controller (Open Source)
   # ref: https://docs.nginx.com/nginx-ingress-controller/install/helm/open-source/
