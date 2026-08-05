@@ -65,17 +65,42 @@ releases:
     createNamespace: true
     chart: common-charts/loki-stack
     version: 1.0.3
+    disableValidation: true
     values:
       - rustfs:
           enabled: false
         loki:
           singleBinary:
-            extraVolumes:
-              - name: storage
-                emptyDir: {}
-            extraVolumeMounts:
-              - name: storage
-                mountPath: /var/loki
+            persistence:
+              enabled: true
+              size: 2Gi
+              storageClass: standard
+        # Chart defaults assume the Loki service is named "{{ .Release.Name }}-loki", but Helm's
+        # fullname helper collapses that to just "{{ .Release.Name }}" when the release name already
+        # contains "loki" (true for release "loki-stack") — so both the Alloy write endpoint and the
+        # Grafana datasource must point at "{{ .Release.Name }}:3100", not "-loki:3100".
+        alloy:
+          alloyConfigMapExtra: |
+            loki.write "endpoint" {
+              endpoint {
+                url = "http://{{ .Release.Name }}:3100/loki/api/v1/push"
+              }
+            }
+        kube-prometheus-stack:
+          grafana:
+            persistence:
+              enabled: true
+              storageClassName: standard
+              size: 1Gi
+            additionalDataSources:
+              - name: Loki
+                type: loki
+                uid: loki
+                url: http://{{ .Release.Name }}:3100
+                access: proxy
+                isDefault: false
+                jsonData:
+                  maxLines: 1000
 
   # RustFS - S3-compatible object storage
   # ref: https://artifacthub.io/packages/helm/rustfs/rustfs
